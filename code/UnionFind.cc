@@ -1,19 +1,18 @@
-#include <iostream>
-#include <vector>
-using namespace std;
-struct UnionFind {
-    vector<int> C;
-    UnionFind(int n) : C(n) { for (int i = 0; i < n; i++) C[i] = i; }
-    int find(int x) { return (C[x] == x) ? x : C[x] = find(C[x]); }
-    void merge(int x, int y) { C[find(x)] = find(y); }
-};
-int main()
-{
-    int n = 5;
-    UnionFind uf(n);
-    uf.merge(0, 2);
-    uf.merge(1, 0);
-    uf.merge(3, 4);
-    for (int i = 0; i < n; i++) cout << i << " " << uf.find(i) << endl;
-    return 0;
+int uf[MAX];
+
+int find(int x) {
+  if(uf[x] != x)
+    uf[x] = find(uf[x]);
+  return uf[x];
+}
+void un(int x, int y) {
+  int x_ = find(x);
+  int y_ = find(y);
+  if(x_==y_) return;
+  r[x_] = r[y_];
+}
+
+int main() {
+  for(int i=0; i<n; i++) uf[i] = i; 
+  return 0;
 }
