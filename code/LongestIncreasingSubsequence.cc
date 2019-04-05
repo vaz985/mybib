@@ -1,48 +1,46 @@
-// Given a list of numbers of length n, this routine extracts a
-// longest increasing subsequence.
-//
-// Running time: O(n log n)
-//
-//   INPUT: a vector of integers
-//   OUTPUT: a vector containing the longest increasing subsequence
-
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
-using namespace std;
+// Binary search (note boundaries in the caller)
+int CeilIndex(std::vector<int> &v, int l, int r, int key) {
+	while (r-l > 1) {
+	int m = l + (r-l)/2;
+	if (v[m] >= key)
+		r = m;
+	else
+		l = m;
+	}
 
-typedef vector<int> VI;
-typedef pair<int,int> PII;
-typedef vector<PII> VPII;
+	return r;
+}
 
-#define STRICTLY_INCREASNG
+int LongestIncreasingSubsequenceLength(std::vector<int> &v) {
+	if (v.size() == 0)
+		return 0;
 
-VI LongestIncreasingSubsequence(VI v) {
-  VPII best;
-  VI dad(v.size(), -1);
+	std::vector<int> tail(v.size(), 0);
+	int length = 1; // always points empty slot in tail
 
-  for (int i = 0; i < v.size(); i++) {
-#ifdef STRICTLY_INCREASNG
-    PII item = make_pair(v[i], 0);
-    VPII::iterator it = lower_bound(best.begin(), best.end(), item);
-    item.second = i;
-#else
-    PII item = make_pair(v[i], i);
-    VPII::iterator it = upper_bound(best.begin(), best.end(), item);
-#endif
-    if (it == best.end()) {
-      dad[i] = (best.size() == 0 ? -1 : best.back().second);
-      best.push_back(item);
-    } else {
-      dad[i] = it == best.begin() ? -1 : prev(it)->second;
-      *it = item;
-    }
-  }
+	tail[0] = v[0];
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v[i] < tail[0])
+			// new smallest value
+			tail[0] = v[i];
+		else if (v[i] > tail[length-1])
+			// v[i] extends largest subsequence
+			tail[length++] = v[i];
+		else
+			// v[i] will become end candidate of an existing subsequence or
+			// Throw away larger elements in all LIS, to make room for upcoming grater elements than v[i]
+			// (and also, v[i] would have already appeared in one of LIS, identify the location and replace it)
+			tail[CeilIndex(tail, -1, length-1, v[i])] = v[i];
+	}
 
-  VI ret;
-  for (int i = best.back().second; i >= 0; i = dad[i])
-    ret.push_back(v[i]);
-  reverse(ret.begin(), ret.end());
-  return ret;
+	return length;
+}
+
+int main() {
+	std::vector<int> v{ 2, 5, 3, 7, 11, 8, 10, 13, 6 };
+	std::cout << "Length of Longest Increasing Subsequence is " << LongestIncreasingSubsequenceLength(v) << 'n';
+return 0;
 }

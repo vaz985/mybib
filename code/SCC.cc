@@ -1,37 +1,28 @@
-#include<memory.h>
-struct edge{int e, nxt;};
-int V, E;
-edge e[MAXE], er[MAXE];
-int sp[MAXV], spr[MAXV];
-int group_cnt, group_num[MAXV];
-bool v[MAXV];
-int stk[MAXV];
-void fill_forward(int x)
-{
-  int i;
-  v[x]=true;
-  for(i=sp[x];i;i=e[i].nxt) if(!v[e[i].e]) fill_forward(e[i].e);
-  stk[++stk[0]]=x;
-}
-void fill_backward(int x)
-{
-  int i;
-  v[x]=false;
-  group_num[x]=group_cnt;
-  for(i=spr[x];i;i=er[i].nxt) if(v[er[i].e]) fill_backward(er[i].e);
-}
-void add_edge(int v1, int v2) //add edge v1->v2
-{
-  e [++E].e=v2; e [E].nxt=sp [v1]; sp [v1]=E;
-  er[  E].e=v1; er[E].nxt=spr[v2]; spr[v2]=E;
-}
-void SCC()
-{
-  int i;
-  stk[0]=0;
-  memset(v, false, sizeof(v));
-  for(i=1;i<=V;i++) if(!v[i]) fill_forward(i);
-  group_cnt=0;
-  for(i=stk[0];i>=1;i--) if(v[stk[i]]){group_cnt++; fill_backward(stk[i]);}
+vi dfs_num, dfs_low, S, visited;
+void tarjanSCC(int u) {
+  dfs_low[u] = dfs_num[u] = dfsNumberCounter++; // dfs_low[u] <= dfs_num[u] 
+  S.push_back(u); // stores u in a vector based on order of visitation 
+  visited[u] = 1;
+  for (int j = 0; j < (int)AdjList[u].size(); j++) {
+    ii v = AdjList[u][j];
+    if (dfs_num[v.first] == UNVISITED)
+      tarjanSCC(v.first);
+    if (visited[v.first]) // condition for update
+      dfs_low[u] = min(dfs_low[u], dfs_low[v.first]); }
+  if (dfs_low[u] == dfs_num[u]) { // if this is a root (start) of an SCC 
+    printf("SCC %d:", ++numSCC); // this part is done after recursion 
+    while (1) {
+      int v = S.back(); S.pop_back(); visited[v] = 0; 
+      printf(" %d", v);
+      if (u == v) 
+      break; 
+    }
+    printf("\n"); 
+  }
 }
 
+dfs_num.assign(V, UNVISITED); dfs_low.assign(V, 0); visited.assign(V, 0); 
+dfsNumberCounter = numSCC = 0;
+for (int i = 0; i < V; i++)
+	if (dfs_num[i] == UNVISITED) 
+		tarjanSCC(i);
