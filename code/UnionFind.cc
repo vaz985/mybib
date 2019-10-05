@@ -9,7 +9,7 @@ void un(int x, int y) {
   int x_ = find(x);
   int y_ = find(y);
   if(x_==y_) return;
-  r[x_] = r[y_];
+  uf[x_] = uf[y_];
 }
 
 int main() {
